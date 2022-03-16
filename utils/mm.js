@@ -15,18 +15,19 @@ export const createList = (callback) => (array) => {
 
 /**
  * @template T
- * @param {{ name: string, render: (data: T, shadow: ShadowRoot, prev: T) => string | null, data?: T | ((node: HTMLElement) => T), handlers?: Record<string, (event: Event, update: (object: Partial<T>) => void, dispatch: (type: string, payload: object) => void) => Promise<void>> }} props 
+ * @param {{ name: string, render: (data: T, shadow: ShadowRoot, prev: T) => string | null, data?: T | ((node: HTMLElement) => T), handlers?: Record<string, (event: Event, update: (object: Partial<T>) => void, dispatch: (type: string, payload: object) => void) => Promise<void>> }} props
  */
 export const createComponent = (props) => {
-  const { name, data, render, handlers = {} } = props
-  if (!name) throw new Error('"name" is required')
-  if (!/\-/.test(name)) throw new Error('"name" requires a hypen ("-") in the value.')
+  const { name, data, render, handlers = {} } = props;
+  if (!name) throw new Error('"name" is required');
+  if (!/\-/.test(name))
+    throw new Error('"name" requires a hypen ("-") in the value.');
 
-  const listeners = Object.keys(handlers)
-  
+  const listeners = Object.keys(handlers);
+
   class Component extends HTMLElement {
     shadow = this.attachShadow({ mode: "closed" });
-    data = typeof data === 'function' ? data(this) : data || {};
+    data = typeof data === "function" ? data(this) : data || {};
 
     update(newData) {
       const prev = { ...this.data };
@@ -34,7 +35,15 @@ export const createComponent = (props) => {
       const result = render(merged, prev, this);
       if (!result) return;
 
-      this.shadow.innerHTML = result;
+      this.shadow.innerHTML = `
+        <style>
+          * { 
+            box-sizing: border-box 
+          }
+        </style>
+        
+        ${result}
+      `;
     }
 
     connectedCallback() {
@@ -67,7 +76,7 @@ export const createComponent = (props) => {
         );
       };
 
-      handler[event.type](event, this.update, dispatch);
+      handlers[event.type](event, this.update, dispatch);
     }
   }
 

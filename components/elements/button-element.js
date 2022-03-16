@@ -1,64 +1,99 @@
-import { createComponent, html } from '../../utils/mm.js'
+import { createComponent, html } from "../../utils/mm.js";
 
-const calcColor = ({ importance, theme }) => {
-    if ()
-}
+const STYLE_MAP = {
+  light: {
+    primary: {
+      border: "rgba(var(--color-green), var(--opacity-none))",
+      background: "rgba(var(--color-green), var(--opacity-solid))",
+      color: "rgba(var(--color-white), var(--opacity-solid))",
+      shadow: "var(--shadow-medium)",
+      hover: "rgba(var(--color-green), var(--opacity-strong))",
+    },
+    secondary: {
+      border: "rgba(var(--color-green), var(--opacity-solid))",
+      background: "rgba(var(--color-green), var(--opacity-none))",
+      color: "rgba(var(--color-green), var(--opacity-solid))",
+      shadow: "var(--shadow-medium)",
+      hover: "rgba(var(--color-green), var(--opacity-sutble))",
+    },
+  },
+  dark: {
+    primary: {
+      border: "rgba(var(--color-white), var(--opacity-none))",
+      background: "rgba(var(--color-white), var(--opacity-solid))",
+      color: "rgba(var(--color-green), var(--opacity-solid))",
+      shadow: "var(--shadow-none)",
+      hover: "rgba(var(--color-white), var(--opacity-strong))",
+    },
+    secondary: {
+      border: "rgba(var(--color-white), var(--opacity-solid))",
+      background: "rgba(var(--color-white), var(--opacity-none))",
+      color: "rgba(var(--color-white), var(--opacity-solid))",
+      shadow: "var(--shadow-none)",
+      hover: "rgba(var(--color-white), var(--opacity-subtle))",
+    },
+  },
+};
 
 createComponent({
-    name: 'button-element',
+  name: "button-element",
 
-    data: ({ dataset }) => ({
-        importance: dataset.importance || 'secondary'
-    }),
+  data: ({ dataset }) => ({
+    importance: dataset.importance || "secondary",
+    theme: dataset.theme || "light",
+    to: dataset.to || null,
+    form: dataset.form || null,
+  }),
 
-    render: (data) => {
-        const { importance } = data
+  render: (data) => {
+    const { importance, theme, to, form } = data;
 
-        const style = html`
-            <style>
-                button, 
-                a {
-                    text-decoration: none;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: var(--radius-subtle);
-                    border: 1px solid rgba(var(--color-green), var(--opacity-${importance === 'secondary' ? 'solid' : 'none'}));;
-                    background: rgba(var(--color-green), var(--opacity-${importance === 'secondary' ? 'none' : 'solid'}));
-                    width: 100%;
-                    padding: var(--spacing-m);
-                    color: rgb(var(--color-${importance === 'secondary' ? 'green' : 'white'}));
-                    font: var(--font-l);
-                    letter-spacing: var(--font-spacing-l);
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    box-shadow: var(--shadow-${importance === 'secondary' ? 'none' : 'medium'});
-                    transform: translateY(0);
-                }
+    const style = html`
+      <style>
+        button,
+        a {
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          padding: var(--spacing-m);
+          font: var(--font-l);
+          letter-spacing: var(--font-spacing-l);
+          text-transform: uppercase;
+          cursor: pointer;
+          transform: translateY(0);
+          border-radius: var(--radius-subtle);
+          border: 1px solid;
 
-                button:hover, 
-                a:hover {
-                    background: rgba(var(--color-green), var(--opacity-${importance === 'secondary' ? 'subtle' : 'crisp'}));
-                }
-
-                button:active, 
-                a:active {
-                    transform: translateY(1px);
-                    box-shadow: var(--shadow-none)
-                }  
-            </style>
-        `
-
-        if (typeof action === 'string') {
-            return html`
-                ${style}
-                <a href=""><slot></slot></a>
-            `
+          background: ${STYLE_MAP[theme][importance].background};
+          color: ${STYLE_MAP[theme][importance].color};
+          shadow: ${STYLE_MAP[theme][importance].shadow};
         }
 
-        return html`
-            ${style}
-            <button><slot></slot></button>
-        `
+        button:hover,
+        a:hover {
+          background: ${STYLE_MAP[theme][importance].hover};
+        }
+
+        button:active,
+        a:active {
+          transform: translateY(1px);
+          box-shadow: var(--shadow-none);
+        }
+      </style>
+    `;
+
+    if (to) {
+      return html`
+        ${style}
+        <a href="${to}"><slot></slot></a>
+      `;
     }
-})
+
+    return html`
+      ${style}
+      <button form="content"><slot></slot></button>
+    `;
+  },
+});
