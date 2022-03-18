@@ -36,7 +36,7 @@ const STYLE_MAP = {
 };
 
 createComponent({
-  name: "button-element",
+  name: "element-button",
 
   data: ({ dataset }) => ({
     importance: dataset.importance || "secondary",

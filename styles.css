@@ -65,9 +65,4 @@ body {
   font: var(--font-m);
   letter-spacing: var(--font-spacing-m);
   color: rgba(var(--color-black), var(--opacity-crisp));
-  display: none;
-}
-
-body.loaded {
-  display: block;
 }

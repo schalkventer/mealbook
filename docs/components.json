@@ -1,0 +1,20 @@
+{
+    "version": 1.1,
+    "tags": [
+      {
+        "name": "element-button",
+        "description": "Button element.",
+        "attributes": [
+          {
+            "name": "data-title",
+            "description": "Visual salience"
+          },
+          {
+            "name": "data-importance",
+            "description": "Visual salience",
+            "values": [{ "name": "primary" }, { "name": "secondary"}]
+          }
+        ]
+      }
+    ]
+  }

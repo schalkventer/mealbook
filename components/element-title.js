@@ -7,7 +7,7 @@ const SIZE_MAP = {
 };
 
 createComponent({
-  name: "title-element",
+  name: "element-title",
 
   data: (node) => {
     const { dataset } = node;

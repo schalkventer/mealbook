@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/scripts.js" defer type="module"></script>
+</head>
+<body>
+    <template-demo>
+        <ul>
+            <li data-component="element-button"></li>
+            <li data-component="element-card"></li>
+            <li data-component="element-dropdown"></li>
+            <li data-component="element-input"></li>
+            <li data-component="element-title"></li>
+        </ul>
+    </template-demo>
+    
+
+    <!-- <script>
+        const getData = async () => {
+           const response = await fetch('/docs/components.json')
+           const { tags } = await response.json()
+           console.log(tags)
+
+            const element = document.querySelector('div')
+            element.innerHTML = `
+                <select>${tags.map(({ name }) => `<option>${name}</option>`)}</select>
+                <p>${tags[0].description}</p>
+                <hr>
+
+                ${tags[0].attributes.map(({ name, description, values }) => `
+                    <div>
+                        ${name}
+                        <p>${description}</p>
+                        ${!values && `<input>`}
+                        ${values && `<select>${values.map(({ name: innerName }) => `<option>${innerName}</option>`)}</select>`}
+                    </div>
+                `)}
+
+            `
+        }
+
+        getData()
+        
+    </script> -->
+</body>
+</html>

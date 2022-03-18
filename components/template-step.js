@@ -1,22 +1,7 @@
 import { createComponent, html } from "../../utils/mm.js";
 
-/**
- * @typedef {object} data
- * @property {'dark' | 'light'} [theme='light']
- * @property {string} primary
- * @property {}
- */
-
-
-/**
- * @
- */
-const createData = () => {
-
-}
-
 createComponent({
-  name: "step-template",
+  name: "template-step",
 
   data: ({ dataset }) => {
     if (!dataset.primary) throw new Error('"data-primary" is required');
@@ -25,7 +10,7 @@ createComponent({
 
     return {
       theme: dataset.theme || "light",
-      primary: dataset.primary
+      primary: dataset.primary,
       next: dataset.next,
       title: dataset.title,
     };

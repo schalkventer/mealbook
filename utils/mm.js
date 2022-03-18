@@ -8,75 +8,86 @@ export const html = (staticArray, ...dynamic) => {
   return `${array.join("")}${stringArray[lastIndexStatic]}`;
 };
 
-export const createList = (callback) => (array) => {
-  const list = array.map((item) => callback(item));
-  return list.join("");
-};
-
 /**
- * @template T
- * @param {{ name: string, render: (data: T, shadow: ShadowRoot, prev: T) => string | null, data?: T | ((node: HTMLElement) => T), handlers?: Record<string, (event: Event, update: (object: Partial<T>) => void, dispatch: (type: string, payload: object) => void) => Promise<void>> }} props
+ * @param {string} name
+ * @param {Record<string, Record<string, (elements: Record<string, HTMLElement>, dispatch: (type: string, payload: Record<string, any>) => void | Promise<void>)} handlers
  */
-export const createComponent = (props) => {
-  const { name, data, render, handlers = {} } = props;
+export const createComponent = (name, init, handlers) => {
   if (!name) throw new Error('"name" is required');
+
   if (!/\-/.test(name))
     throw new Error('"name" requires a hypen ("-") in the value.');
 
-  const listeners = Object.keys(handlers);
+  const elementsList = Object.keys(handlers).filter(value => value !== 'root');
+
+  const elementsEventObj = elementsList.reduce((result, elementName) => {
+    return {
+      ...result,
+      ...handlers[elementName],
+    };
+  }, {});
+
+  const eventsList = Object.keys(elementsEventObj);
 
   class Component extends HTMLElement {
     shadow = this.attachShadow({ mode: "closed" });
-    data = typeof data === "function" ? data(this) : data || {};
-
-    update(newData) {
-      const prev = { ...this.data };
-      const merged = { ...this.data, ...newData };
-      const result = render(merged, prev, this);
-      if (!result) return;
-
-      this.shadow.innerHTML = `
-        <style>
-          * { 
-            box-sizing: border-box 
-          }
-        </style>
-        
-        ${result}
-      `;
-    }
-
-    connectedCallback() {
-      listeners.forEach((eventType) => {
-        this.shadow.addEventListener(eventType, this.handlerWrapper);
-      });
-
-      this.update({});
-    }
-
-    disconnectedCallback() {
-      listeners.forEach((eventType) => {
-        this.shadow.removeEventListener(eventType, this.handlerWrapper);
-      });
-    }
+    elements = {};
 
     constructor() {
       super();
     }
 
-    handlerWrapper(event) {
-      const dispatch = (type, payload) => {
-        this.dispatchEvent(
-          new CustomEvent(type, {
-            composed: true,
-            bubbles: true,
-            cancelable: true,
-            detail: payload,
-          })
-        );
-      };
+    dispatch = (type, payload) => {
+      this.dispatchEvent(
+        new CustomEvent(type, {
+          composed: true,
+          bubbles: true,
+          cancelable: true,
+          detail: payload,
+        })
+      );
+    };
 
-      handlers[event.type](event, this.update, dispatch);
+    handlerWrapper = (event) => {
+      const { target, type } = event;
+      const { dataset = {} } = target || {};
+      const { key } = dataset;
+      const element = handlers[key] || {};
+      const callback = element[type];
+
+      if (!key || !callback) return;
+      callback(this.elements, this.dispatch);
+    }
+
+    connectedCallback() {
+      this.shadow.innerHTML = init(this);
+
+      this.elements = elementsList.reduce((result, elementName) => {
+        return {
+          ...result,
+          [elementName]: this.shadow.querySelector(
+            `[data-key="${elementName}"]`
+          ),
+        };
+      }, {});
+
+      if (handlers.root && handlers.root.connect) {
+        handlers.root.connect(this.elements, this.dispatch)
+      }
+
+      eventsList.forEach((eventType) => {
+        this.shadow.addEventListener(eventType, this.handlerWrapper);
+      });
+    }
+
+    disconnectedCallback() {
+      if (handlers.root && handlers.root.disconnect) {
+        handlers.root.disconnect(this.elements, this.dispatch)
+      }
+
+      eventsList.forEach((eventType) => {
+        this.shadow.removeEventListener(eventType, this.handlerWrapper);
+      });
     }
   }
 
